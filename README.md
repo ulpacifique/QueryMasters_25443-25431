@@ -1,8 +1,8 @@
 ## Group Name: QueryMasters
 
 ## Team Members
-- [Your Name]
-- [Partner's Name]
+-UWIHIRWE Pacifique Lazaro 25443
+-GIRINEZA Honore 25431
 
 ## Project Overview
 This project explores SQL window functions on a retail sales dataset. We demonstrate the use of various analytical functions like LAG(), LEAD(), RANK(), DENSE_RANK(), ROW_NUMBER(), and aggregate window functions to analyze sales data.
@@ -53,5 +53,87 @@ ORDER BY
 - For the first record in each category (no previous record), we display 'FIRST SALE'.
 
 *Screenshot:*
-screenshots/Compare Values with Previous or Next Records.png
+![Compare Values with Previous or Next Records](https://github.com/user-attachments/assets/011c4850-2b31-4f14-aa5a-33643664c59e)
+
+
+*Real-Life Application:*
+This type of analysis helps in identifying sales trends over time within categories. Retailers can track whether sales amounts are consistently increasing or decreasing, helping to identify seasonal patterns or the impact of marketing campaigns.
+
+### 2. Ranking Data within a Category
+
+*Query:*
+sql
+SELECT 
+    s.sale_id,
+    c.category_name,
+    r.region_name,
+    s.amount,
+    RANK() OVER (PARTITION BY s.category_id ORDER BY s.amount DESC) AS sales_rank,
+    DENSE_RANK() OVER (PARTITION BY s.category_id ORDER BY s.amount DESC) AS sales_dense_rank
+FROM 
+    sales s
+JOIN 
+    categories c ON s.category_id = c.category_id
+JOIN 
+    regions r ON s.region_id = r.region_id
+ORDER BY 
+    c.category_name, 
+    s.amount DESC;
+
+
+*Explanation of Difference:*
+RANK() vs DENSE_RANK():
+- RANK(): Assigns the same rank to tied values, then skips the next rank(s).
+  - Example: Values [100, 90, 90, 80] get ranks [1, 2, 2, 4]
+- DENSE_RANK(): Assigns the same rank to tied values, but doesn't skip ranks.
+  - Example: Values [100, 90, 90, 80] get ranks [1, 2, 2, 3]
+
+*Screenshot:*
+
+![Ranking Data within a Category](https://github.com/user-attachments/assets/4efcd5c4-0de2-4476-ad8e-c8998acd7a5c)
+
+*Real-Life Application:*
+Ranking functions help businesses identify top-performing products or sales in each category. This is valuable for inventory management, sales team incentives, and marketing decisions. RANK() might be used when you want to strictly limit the number of rankings (like "top 3"), while DENSE_RANK() is useful when you want to ensure all items of equal value receive recognition.
+
+### 3. Identifying Top Records
+
+*Query:*
+sql
+WITH ranked_sales AS (
+    SELECT 
+        s.sale_id,
+        r.region_name,
+        c.category_name,
+        s.amount,
+        DENSE_RANK() OVER (PARTITION BY s.region_id ORDER BY s.amount DESC) AS sales_rank
+    FROM 
+        sales s
+    JOIN 
+        categories c ON s.category_id = c.category_id
+    JOIN 
+        regions r ON s.region_id = r.region_id
+)
+SELECT 
+    sale_id,
+    region_name,
+    category_name,
+    amount,
+    sales_rank
+FROM 
+    ranked_sales
+WHERE 
+    sales_rank <= 3
+ORDER BY 
+    region_name, 
+    sales_rank;
+
+
+*Explanation:*
+- We use DENSE_RANK() to ensure that ties (sales with the same amount) receive the same rank.
+- The Common Table Expression (CTE) creates a temporary result set with the ranking information.
+- We filter the results to only show the top 3 sales from each region.
+
+*Screenshot:*
+![Identifying Top Records](https://github.com/user-attachments/assets/32ff46a0-c1bf-4bae-a939-56456b61ad65)
+
 
