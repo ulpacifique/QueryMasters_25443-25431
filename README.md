@@ -1,4 +1,4 @@
-![Finding the Earliest Records](https://github.com/user-attachments/assets/b632568c-c287-4a59-8d64-57687b6e1dea)## Group Name: QueryMasters
+## Group Name: QueryMasters
 
 ## Team Members
 -UWIHIRWE Pacifique Lazaro 25443
