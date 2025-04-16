@@ -179,6 +179,65 @@ ORDER BY
 *Screenshot:*
 ![Finding the Earliest Records](https://github.com/user-attachments/assets/5e35bc48-3877-43c9-a7eb-71b93674a1ff)
 
+*Real-Life Application:*
+Analyzing the earliest sales in each category can help businesses understand which products started selling first after a product launch or the beginning of a season. This information is valuable for planning future product releases and understanding initial market reception to new product categories.
+
+### 5. Aggregation with Window Functions
+
+*Query:*
+sql
+SELECT 
+    s.sale_id,
+    c.category_name,
+    r.region_name,
+    s.amount,
+    MAX(s.amount) OVER (PARTITION BY s.category_id) AS max_amount_in_category,
+    MAX(s.amount) OVER () AS max_amount_overall,
+    s.amount / MAX(s.amount) OVER (PARTITION BY s.category_id) * 100 AS percentage_of_category_max,
+    s.amount / MAX(s.amount) OVER () * 100 AS percentage_of_overall_max
+FROM 
+    sales s
+JOIN 
+    categories c ON s.category_id = c.category_id
+JOIN 
+    regions r ON s.region_id = r.region_id
+ORDER BY 
+    c.category_name, 
+    s.amount DESC;
+
+
+*Explanation:*
+- We calculate the maximum sale amount within each category using MAX() with a PARTITION BY clause.
+- We calculate the overall maximum sale amount across all records using MAX() without partitioning.
+- We also calculate each sale as a percentage of its category maximum and the overall maximum.
+- This provides context for each sale amount relative to both its category and the entire dataset.
+
+*Screenshot:*
+
+![Aggregation with Window  a](https://github.com/user-attachments/assets/f07f289f-d6e1-4151-8262-7af3a62858fa)
+
+*Real-Life Application:*
+This analysis helps businesses understand how sales amounts compare both within categories and across the entire business. It can identify categories with higher-value transactions and help normalize sales figures across different product types. The percentage calculations provide a relative scale that makes it easier to compare performance across categories with different price points.
+
+## Conclusion
+
+SQL window functions provide powerful tools for analyzing data across rows without the need for complex self-joins or subqueries. Through this project, we've demonstrated how these functions can be used to:
+
+1. Compare values between adjacent rows (LAG/LEAD)
+2. Rank data within categories (RANK/DENSE_RANK)
+3. Filter for top performers (DENSE_RANK with filtering)
+4. Find earliest transactions (ROW_NUMBER with date ordering)
+5. Calculate aggregates while preserving row details (window aggregation)
+
+These techniques enable more sophisticated data analysis directly within SQL queries, making it easier to extract actionable business insights from transactional data.
+
+## References
+
+- [Oracle SQL Window Functions Documentation](https://docs.oracle.com/en/database/oracle/oracle-database/19/sqlrf/Analytic-Functions.html)
+- [SQL Tutorial on Window Functions](https://www.youtube.com/watch?v=H6OTMoXjNiM)
+
+  
+
 
 
 
