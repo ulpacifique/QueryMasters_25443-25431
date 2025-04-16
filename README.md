@@ -53,4 +53,5 @@ ORDER BY
 - For the first record in each category (no previous record), we display 'FIRST SALE'.
 
 *Screenshot:*
-Compare Values with Previous or Next Records.png
+screenshots/Compare Values with Previous or Next Records.png
+
