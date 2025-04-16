@@ -1,4 +1,4 @@
-## Group Name: QueryMasters
+![Finding the Earliest Records](https://github.com/user-attachments/assets/b632568c-c287-4a59-8d64-57687b6e1dea)## Group Name: QueryMasters
 
 ## Team Members
 -UWIHIRWE Pacifique Lazaro 25443
@@ -135,5 +135,50 @@ ORDER BY
 
 *Screenshot:*
 ![Identifying Top Records](https://github.com/user-attachments/assets/32ff46a0-c1bf-4bae-a939-56456b61ad65)
+
+*Real-Life Application:*
+Identifying top sales by region allows companies to recognize regional strengths and allocate resources effectively. It can inform regional marketing strategies, help identify regional preferences, and guide inventory distribution across different locations.
+
+### 4. Finding the Earliest Records
+
+*Query:*
+sql
+WITH ranked_by_date AS (
+    SELECT 
+        s.sale_id,
+        c.category_name,
+        s.sale_date,
+        s.amount,
+        ROW_NUMBER() OVER (PARTITION BY s.category_id ORDER BY s.sale_date) AS date_rank
+    FROM 
+        sales s
+    JOIN 
+        categories c ON s.category_id = c.category_id
+)
+SELECT 
+    sale_id,
+    category_name,
+    sale_date,
+    amount,
+    date_rank
+FROM 
+    ranked_by_date
+WHERE 
+    date_rank <= 2
+ORDER BY 
+    category_name, 
+    date_rank;
+
+
+*Explanation:*
+- ROW_NUMBER() assigns a unique sequential number to each row within each category partition.
+- We order by sale_date to ensure the earliest sales get the lowest row numbers.
+- By filtering for rows with date_rank <= 2, we get exactly the first two sales for each category.
+- This approach handles the case where multiple sales might have occurred on the same date.
+
+*Screenshot:*
+![Finding the Earliest Records](https://github.com/user-attachments/assets/5e35bc48-3877-43c9-a7eb-71b93674a1ff)
+
+
 
 
